@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  api:
+    image: lincolnowiti/rutuba_ml_service:v1
+    build: .
+    container_name: fastapi-app
+    ports:
+      - "4440:4440"
+    volumes:
+      - .:/app   # enables hot reload
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

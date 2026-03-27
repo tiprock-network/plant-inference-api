@@ -1,0 +1,18 @@
+# Python virtual environment
+.venv
+venv/
+
+# Cache & build artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter notebooks
+*.ipynb
+
+# CatBoost files
+catboost_info/
+
+# Git
+.git
+.gitignore
