@@ -12,3 +12,10 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
+  watchtower:
+    image: containrrr/watchtower
+    container_name: rutuba-watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
+    restart: unless-stopped
