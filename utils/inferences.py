@@ -22,7 +22,7 @@ le_variety.classes_ = np.array([
 def preprocess_input(data: list):
     columns = [
         'Nitrogen','Phosphorus','Potassium',
-        'Temperature','Humidity','pH_Value','Variety'
+        'Temperature','Humidity','pH_Value'
     ]
 
     
@@ -32,11 +32,11 @@ def preprocess_input(data: list):
     df = pd.DataFrame(data, columns=columns)
 
     # encode Variety
-    df["Variety"] = le_variety.transform(df["Variety"])
+    #df["Variety"] = le_variety.transform(df["Variety"])
 
     # log transform
-    for col in ["Phosphorus", "Potassium", "Humidity"]:
-        df[col] = np.log1p(df[col])
+    #for col in ["Phosphorus", "Potassium", "Humidity"]:
+    #    df[col] = np.log1p(df[col])
 
     return df.astype(float)
 

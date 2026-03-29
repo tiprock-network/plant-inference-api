@@ -12,7 +12,7 @@ from utils.model_eval import evaluate_model, track_model_performance
 def load_and_preprocess_data(data_path: str):
     # 1. Load and create an explicit copy to avoid SettingWithCopyWarning
     df = pd.read_csv(data_path)
-    cols = ['Nitrogen','Phosphorus','Potassium','Temperature','Humidity','pH_Value','Variety','Crop']
+    cols = ['Nitrogen','Phosphorus','Potassium','Temperature','Humidity','pH_Value','Crop']
     
     # .copy() ensures sensor_df is its own object in memory
     sensor_df = df[cols].copy()
@@ -21,13 +21,15 @@ def load_and_preprocess_data(data_path: str):
     sensor_df["Crop"] = sensor_df["Crop"].str.lower()
     
     # Using a dictionary comprehension is cleaner than a manual loop
-    crop_categories = sensor_df["Crop"].unique()
-    crop_categories_map = {name: i for i, name in enumerate(crop_categories)}
-    sensor_df["Crop"] = sensor_df["Crop"].map(crop_categories_map)
+    # In load_and_preprocess_data
+    CROP_MAPPING = {"wheat": 0, "tomato": 1, "sugarcane": 2, "maize": 3, "potato": 4, "rice": 5}
+    sensor_df["Crop"] = sensor_df["Crop"].str.lower().map(CROP_MAPPING)
 
+    
+    
     # 3. Encode Variety
-    le_variety = LabelEncoder()
-    sensor_df['Variety'] = le_variety.fit_transform(sensor_df['Variety'])
+    #le_variety = LabelEncoder()
+    #sensor_df['Variety'] = le_variety.fit_transform(sensor_df['Variety'])
 
     # 4. Split Features and Target
     X = sensor_df.drop(columns=["Crop"])
@@ -52,7 +54,7 @@ def load_and_preprocess_data(data_path: str):
         X_train_log[col] = np.log1p(X_train_log[col])
         X_test_log[col] = np.log1p(X_test_log[col])
     
-    return X, y, X_train_log, X_test_log, y_train, y_test, feature_names
+    return X, y, X_train, X_test, y_train, y_test, feature_names
 
 
 def train_model_mlflow(X_train, X_test, y_train, y_test, y_all):
@@ -67,12 +69,38 @@ def train_model_mlflow(X_train, X_test, y_train, y_test, y_all):
 
 
     start_train = time.time()
-    xgb_model.fit(X_train, y_train)
+    xgb_model.fit(
+        X_train, y_train,
+        eval_set=[(X_train, y_train), (X_test, y_test)],
+        verbose=False
+        )
     end_train = time.time() - start_train
 
     y_pred_xgb = xgb_model.predict(X_test)
 
-    xgboost_model_result = track_model_performance(xgb_model, "XGBoost Classifier", X_test, y_test, y_pred_xgb, end_train)
+    #MINI TEST PHASE 1
+    # Predict on BOTH sets
+    y_pred_train = xgb_model.predict(X_train)
+    y_pred_test = xgb_model.predict(X_test)
+
+    # Calculate Accuracy
+    from sklearn.metrics import accuracy_score
+    train_acc = accuracy_score(y_train, y_pred_train)
+    test_acc = accuracy_score(y_test, y_pred_test)
+
+    print(f"Training Accuracy: {train_acc:.4f}")
+    print(f"Testing Accuracy:  {test_acc:.4f}")
+    print(f"Gap: {train_acc - test_acc:.4f}")
+
+    xgboost_model_result = track_model_performance(xgb_model, 
+                                                   "XGBoost Classifier", 
+                                                   X_test, 
+                                                   y_test, 
+                                                   y_pred_xgb, 
+                                                   end_train)
+    
+    results = xgb_model.evals_result()
+    
 
     print(f"MODEL EVALUATION:\n")
     print("--"*30)
