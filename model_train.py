@@ -22,7 +22,8 @@ def load_and_preprocess_data(data_path: str):
     
     # Using a dictionary comprehension is cleaner than a manual loop
     # In load_and_preprocess_data
-    CROP_MAPPING = {"wheat": 0, "tomato": 1, "sugarcane": 2, "maize": 3, "potato": 4, "rice": 5}
+    CROP_MAPPING = {'orange': 0, 'pomegranate': 1, 'apple': 2, 'banana': 3, 'watermelon': 4, 'coconut': 5, 'chickpea': 6, 'sugarcane': 7, 'mango': 8, 'mothbeans': 9, 'grapes': 10, 'potato': 11, 'rice': 12, 'cotton': 13, 'blackgram': 14, 'kidneybeans': 15, 'jute': 16, 'lentil': 17, 'papaya': 18, 'coffee': 19, 'wheat': 20, 'tomato': 21, 'muskmelon': 22, 'mungbean': 23, 'maize': 24, 'pigeonpeas': 25}
+    
     sensor_df["Crop"] = sensor_df["Crop"].str.lower().map(CROP_MAPPING)
 
     
@@ -46,7 +47,7 @@ def load_and_preprocess_data(data_path: str):
 
     # 6. Apply Log Transformation
     # We create copies here to keep the original X_train/X_test intact
-    skewed_features = ["Phosphorus", "Potassium", "Humidity"]
+    skewed_features = ["Nitrogen","Phosphorus", "Potassium", "Humidity"]
     X_train_log = X_train.copy()
     X_test_log = X_test.copy()
 

@@ -4,17 +4,6 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 
-# -----------------------------
-# LOAD ENCODER (you hardcoded it)
-# -----------------------------
-le_variety = LabelEncoder()
-le_variety.classes_ = np.array([
-    'Soft Red','Beefsteak','Co 86032','Co 0238','Sweet',
-    'Yukon Gold','Hard Red','Flint','Basmati','Co 99004',
-    'Dent','Roma','Russet','Jasmine','Cherry',
-    'Arborio','Red','Durum'
-])
-
 
 # -----------------------------
 # PREPROCESS
@@ -31,12 +20,11 @@ def preprocess_input(data: list):
     # create DataFrame
     df = pd.DataFrame(data, columns=columns)
 
-    # encode Variety
-    #df["Variety"] = le_variety.transform(df["Variety"])
+    
 
     # log transform
-    #for col in ["Phosphorus", "Potassium", "Humidity"]:
-    #    df[col] = np.log1p(df[col])
+    for col in ["Phosphorus", "Potassium", "Humidity"]:
+        df[col] = np.log1p(df[col])
 
     return df.astype(float)
 
@@ -48,7 +36,35 @@ def preprocess_input(data: list):
 # UPDATED INFERENCE
 # -----------------------------
 def inference_fn(model_path: str, data: list):
-    crops = ["wheat", "tomato", "sugarcane", "maize", "potato", "rice"]
+
+    crops = [
+        'orange',
+        'pomegranate',
+        'apple',
+        'banana',
+        'watermelon',
+        'coconut',
+        'chickpea',
+        'sugarcane',
+        'mango',
+        'mothbeans',
+        'grapes',
+        'potato',
+        'rice',
+        'cotton',
+        'blackgram',
+        'kidneybeans',
+        'jute',
+        'lentil',
+        'papaya',
+        'coffee',
+        'wheat',
+        'tomato',
+        'muskmelon',
+        'mungbean',
+        'maize',
+        'pigeonpeas'
+    ]
 
     # load model
     with open(model_path, "rb") as f:
