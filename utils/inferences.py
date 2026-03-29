@@ -44,8 +44,11 @@ def preprocess_input(data: list):
 # -----------------------------
 # INFERENCE
 # -----------------------------
+# -----------------------------
+# UPDATED INFERENCE
+# -----------------------------
 def inference_fn(model_path: str, data: list):
-    crops = ["wheat","tomato","sugarcane","maize","potato","rice"]
+    crops = ["wheat", "tomato", "sugarcane", "maize", "potato", "rice"]
 
     # load model
     with open(model_path, "rb") as f:
@@ -54,9 +57,20 @@ def inference_fn(model_path: str, data: list):
     # preprocess
     X = preprocess_input(data)
 
-    # predict
-    preds = model.predict(X)
-    
+    # 1. Use predict_proba to get the confidence scores for all classes
+    # probabilities will be an array like [[0.1, 0.05, 0.8, ...]]
+    probabilities = model.predict_proba(X)
 
-    crop_recommendation = crops[int(preds.tolist()[0])]
-    return crop_recommendation
+    # 2. Get the index of the highest probability
+    best_index = np.argmax(probabilities, axis=1)[0]
+
+    # 3. Get the actual probability value (score)
+    confidence_score = np.max(probabilities, axis=1)[0]
+
+    # 4. Map the index to the crop name
+    crop_recommendation = crops[best_index]
+
+    return {
+        "recommendation": crop_recommendation,
+        "confidence": float(confidence_score),
+    }
